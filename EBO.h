@@ -6,11 +6,16 @@
 class EBO
 {
 public:
+	// ID reference on Element Buffer Object
 	GLuint ID;
-	EBO(GLuint* vertices, GLsizeiptr size);
+	// Constructir that generates a EBO & links it to indices
+	EBO(GLuint* indices, GLsizeiptr size);
 
+	// binds EBO
 	void Bind();
+	// unbinds EBO
 	void Unbind();
+	// deletes EBO
 	void Delete();
 };
 
