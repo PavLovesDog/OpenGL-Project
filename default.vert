@@ -1,15 +1,7 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-
-// Outputs the colour of Fragment Shader
-out vec3 color;
-
-uniform float scale;
-
+layout (location = 0) in vec3 pos;
+ 
 void main()
 {
-   gl_Position = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
-   // Assigns the colors from Vertex Data to "color"
-   color = aColor;
-};
+    gl_Position = vec4(pos.xyz, 1.0);
+}

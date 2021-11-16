@@ -1,6 +1,9 @@
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glad\glad.h>
+#include <GLFW\glfw3.h>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtc\type_ptr.hpp>
 
 #include"shaderClass.h"
 #include"VAO.h"
@@ -13,23 +16,22 @@
 // Vertices Coordinates, coordinates for geometry shape
 GLfloat vertices[] = 
 {
-	//			 COORDINATES				       ||				COLOURS
-	// X ,              Y            ,       Z  ,        R  ,  G  ,   B
-	-0.5f, -0.5f * float(sqrt(3)) / 3,		0.0f,		1.0f, 0.5f,  0.0f,  // lower left corner
-	 0.5f, -0.5f * float(sqrt(3)) / 3,		0.0f,		0.0f, 1.0f,  0.0f, // lower right corner
-	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3,  0.0f,		0.5f, 0.25f,  1.0f, // upper corner
-	// below added more vertices for added triangle in middle
-	-0.25f, 0.5f * float(sqrt(3)) / 6,		0.0f,		1.0f, 0.5f, 0.0f, // Inner left
- 	 0.25f, 0.5f * float(sqrt(3)) / 6,		0.0f,		0.5f, 1.0f, 0.0f, // Inner right
-	 0.0f, -0.5f * float(sqrt(3)) / 3,		0.0f,		0.0f, 0.25f, 1.0f // Inner bottom
+	//COORDINATES				     
+	// X ,   Y  ,    Z  
+	-1.0f, -1.0f, -0.0f, // top right
+	 1.0f,  1.0f, -0.0f, // bottom right
+	-1.0f,  1.0f, -0.0f, // bottom left
+	 1.0f, -1.0f, -0.0f // top left
 };
 
 GLuint indices[] =
 {
-	0,3,5, // lower left triangle
-	3,2,4, // lower right triangle
-	5,4,1 // upper triangle
+	0,1,2, // first triangle
+	0,3,1 // second triangle
 };
+
+int screenWidth{ 800 };
+int screenHeight{ 800 };
 
 
 int main()
@@ -44,7 +46,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
 	// Create window
-	GLFWwindow* window = glfwCreateWindow(800, 800, "OpenGL Window", NULL, NULL); // (width, height, title, fullscreened, unknown)
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Mandlebrot Viewer", NULL, NULL); // (width, height, title, fullscreened, unknown)
 	if (window == NULL) // error check
 	{
 		std::cout << "Failed to create the GLFW window dude." << std::endl;
@@ -55,7 +57,7 @@ int main()
 	// use glad to load configurations of OpenGL
 	gladLoadGL();
 
-	glViewport(0, 0, 800, 800); // coordinates of display within window, specifying the viewport
+	glViewport(0, 0, screenWidth, screenHeight); // coordinates of display within window, specifying the viewport
 
 	// call to shader cpp, creates shader object using default.vert & default.frag
 	Shader shaderProgram("default.vert", "default.frag");
@@ -70,8 +72,8 @@ int main()
 
 	// link VBO attributes (coordinates & colour) to VAO
 	// LinkAttribute(VBO VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
-	VAO1.LinkAttribute(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0); // stride is 6 * sife of float in bytes
-	VAO1.LinkAttribute(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3*sizeof(float))); // offset between coordin. & RGB's is 3 * float byte size
+	VAO1.LinkAttribute(VBO1, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0); // stride is 3 * sife of float in bytes
+	//VAO1.LinkAttribute(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3*sizeof(float))); // offset between coordin. & RGB's is 3 * float byte size
 
 	// Unbind all objects to prevent accidental modification
 	VAO1.Unbind();
@@ -79,7 +81,7 @@ int main()
 	EBO1.Unbind();
 
 	// get ID's of uniform called "scale"
-	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
+	//GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 	// set colour of window background
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f); // (R, G, B, Opacity)
@@ -92,11 +94,16 @@ int main()
 		// keep window colour
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
 		shaderProgram.Activate(); //activate shader program
-		glUniform1f(uniID, 0.5f); // assign a value to uniform (set size of vertices using uniform variable) NOTE: must be done AFTER SP.activate()
+
+		//glUniform1f(uniID, 0.5f); // assign a value to uniform (set size of vertices using uniform variable) NOTE: must be done AFTER SP.activate()
+
 		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
-		//glDrawArrays(GL_TRIANGLES, 0, 3); // Draw shape, using GL_TRIANGLES primitive
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 9 is vertex amount
+
+		//glDrawArrays(GL_TRIANGLES, 0, 6); // Draw shape, using GL_TRIANGLES primitive
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 9 is vertex amount
+
 		glfwSwapBuffers(window); // swap buffer so image gets updated each frame
 
 		// process all glfw window events
