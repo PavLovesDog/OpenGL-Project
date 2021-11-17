@@ -64,6 +64,11 @@ void Shader::Delete()
 	glDeleteProgram(ID);
 }
 
+void Shader::set_vec4(const std::string& name, glm::vec4 vec) const
+{
+	glUniform4f(glGetUniformLocation(ID, name.c_str()), vec.x, vec.y, vec.z, vec.w);
+}
+
 // checks if the different shaders have compiled properly
 void Shader::compileErrors(unsigned int shader, const char* type)
 {

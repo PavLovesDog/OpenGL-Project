@@ -2,6 +2,7 @@
 #define SHADER_CLASS_H
 
 #include<glad/glad.h>
+#include<glm\glm.hpp>
 #include<string>
 #include<fstream>
 #include<sstream>
@@ -23,6 +24,8 @@ public:
 	void Activate();
 	// deletes the shader program
 	void Delete();
+	void set_vec4(const std::string& name, glm::vec4 vec) const;
+
 private:
 	// checks if the different shaders have compiled properly
 	void compileErrors(unsigned int shader, const char* type);
