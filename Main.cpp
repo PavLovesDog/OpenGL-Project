@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm> // for std::sort
+#include <cmath> // for fragment shader
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
+#include <stb\stb_image.h>
 
 #include"shaderClass.h"
 #include"VAO.h"
@@ -19,27 +21,61 @@ GLfloat vertices[] =
 {
 	//COORDINATES				     
 	// X ,   Y  ,    Z  
-	-1.0f, -1.0f, -0.0f, // top right
-	 1.0f,  1.0f, -0.0f, // bottom right
-	-1.0f,  1.0f, -0.0f, // bottom left
-	 1.0f, -1.0f, -0.0f // top left
+	// positions          // colors           // texture coords
+	//TODO POSITIONS NEED ADJUSTING
+	// 1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+	// 1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	//-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	//-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+
+	// Original - Works
+    -1.0f, -1.0f, -0.0f,  
+	 1.0f,  1.0f, -0.0f,  
+	-1.0f,  1.0f, -0.0f,   
+	 1.0f, -1.0f, -0.0f
+	 
 };
 
 // Indices for vertex coordinates
 GLuint indices[] =
 {
-	0,1,2, // first triangle
-	0,3,1 // second triangle
+	0, 1, 2, // first triangle
+	0, 3, 1, // second triangle
 };
 
+// colour * uniforms class sourced from mandlebrot project: https://github.com/realmar/mandelbrot-cpp
+// for use of colouring the mandlebrot
+struct Colour {
+
+	float x;
+	float y;
+	float z;
+	float w;
+
+	Colour(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
+};
+
+struct Uniforms {
+	GLint uni_screenWidth;
+	GLint uni_screenHeight;
+
+	GLint uni_centerX;
+	GLint uni_centerY;
+
+	GLint uni_startColour;
+	GLint uni_endColour;
+};
+
+
 // Global Variables
-int screenWidth{ 1280 };
-int screenHeight{ 960 };
+float screenWidth{ 1280 },
+	  screenHeight{ 960 };
 // variables for maving around image
 float centerX{ 0.0f };
 float centerY{ 0.0f };
 float zoom{ 1.0f };
 float speed{ 0.0025f };
+
 
 // Initialise the GLFW, determine which profile to use
 void initialise()
@@ -53,6 +89,12 @@ void initialise()
 	// tell GLFW which profile to use, which is CORE profile, this only uses modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+}
+
+// handle Resize-ing of window
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
 }
 
 // Error checks window creation, sets the initial background colour,
@@ -69,7 +111,8 @@ void setup_GLwindow(GLFWwindow* window)
 	// use glad to load configurations of OpenGL
 	gladLoadGL();
 
-	glViewport(0, 0, screenWidth, screenHeight); // coordinates of display within window, specifying the viewport
+	//glViewport(0, 0, screenWidth, screenHeight); // coordinates of display within window, specifying the viewport
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// set colour of window background
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f); // (R, G, B, Opacity)
@@ -141,6 +184,7 @@ void handle_input(GLFWwindow* window)
 	}
 }
 
+// This function directly copied from online..
 glm::vec4 find_ranges(std::vector<float> &data)
 {
 	std::sort(data.begin(), data.end()); // arrange elements in ascending order
@@ -180,6 +224,56 @@ int main()
 	EBO EBO1(indices, sizeof(indices)); // EBO links to indices
 	unbind_link_shaders(VAO1, VBO1, EBO1); // unbind and link shaders!
 
+	// +================================================= colour testing
+	// get uniform variables from shader
+	Uniforms uniforms;
+    // uniforms are global variables which are shared between GPU and CPU
+	uniforms.uni_startColour = glGetUniformLocation(shaderProgram.ID, "start_color");
+	uniforms.uni_endColour = glGetUniformLocation(shaderProgram.ID, "end_color");
+
+	// Set initial colors
+	Colour startColour(-0.12344, 0.346532, 0.22344, 0.15563);
+	Colour endColour(0.92344, -0.646532, 0.82344, 0.85563);
+
+	// debugging
+	float c = sqrt(float(380.0f) / float(500.0f)) / 2;
+	float x = (cos(startColour.x) / c / sin(endColour.x)) / tan(c) / sin(12.0);
+	float y = (sin(startColour.y) / c / tan(endColour.y)) / sin(c) / cos(22.0);
+	float z = (tan(startColour.z) / c / cos(endColour.z)) / cos(c) / tan(32.0);
+	std::cout << x << " " << y << " " << z << std::endl;
+	float cosX = cos(x);
+	float sinY = sin(y);
+	float sinZ = sin(z);
+	std::cout << cosX << " " << sinY << " " << sinZ << std::endl;
+
+	// generate texture  ================================================================= TEST
+	// https://learnopengl.com/Getting-started/Textures
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_1D, texture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// load/ generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("rainbow.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+
 	std::vector<float> pixel_data(screenWidth * screenHeight, 0.0f);  //TODO this never seems to be populated? ?
 	glm::vec4 ranges = glm::vec4(0.0f, 0.5f, 0.66667f, 1.0f);
 	
@@ -192,28 +286,37 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shaderProgram.Activate(); //activate shader program
-		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
 
 		// send uniform variable values to fragment shader
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "zoom"), zoom);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerX"), centerX);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerY"), centerY);
 		shaderProgram.set_vec4("color_ranges", ranges); // set vec4 values for colour ranges
-
-		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data()); //TODO is this suppose to populate pixel_data??
-		ranges = find_ranges(pixel_data);
-
+		//glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), ranges.x, ranges.y, ranges.z, ranges.w);
 		
+		// Setting the colors
+		glUniform4f(uniforms.uni_startColour, startColour.x, startColour.y, startColour.z, startColour.w);
+		glUniform4f(uniforms.uni_endColour, endColour.x, endColour.y, endColour.z, endColour.w);
+
+
+		// bind texture
+		glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+		glBindTexture(GL_TEXTURE_2D, texture);
+		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
+		//glDrawArrays(GL_TRIANGLES, 0, 6); // cuts screen in half???
+
+
+		// read the colour ranges of pixels on screen, save to pixel data
+		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data()); //TODO is this reading screen right? does noseem to save ANY data into pixel_data...
+		ranges = find_ranges(pixel_data); // set new colour in ranges to pass into 'color_ranges' next pass
+
 		glfwSwapBuffers(window); // swap buffer so image gets updated each frame
+		
 		// process all glfw window events
 		glfwPollEvents();
 		handle_input(window);
-
 	}
-
-	
 
 	// DELETE all objects created
 	VAO1.Delete();
