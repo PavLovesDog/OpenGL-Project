@@ -24,7 +24,6 @@ public:
 	void Activate();
 	// deletes the shader program
 	void Delete();
-	void set_vec4(const std::string& name, glm::vec4 vec) const;
 
 private:
 	// checks if the different shaders have compiled properly

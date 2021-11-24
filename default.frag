@@ -1,37 +1,38 @@
-#version 410 core
-in vec4 gl_FragCoord;
+/*
+    This fragment shader script processes a single fragment by taking in a set of colours & depth value,
+    it then performs the operations below on the fragment and outputs it with new coordinates and color data. 
+    this happens after the rasterization stage on the OpenGL pipeline.
+    for every fragment, or pixel, on the screen, this code will run through the GPU. i.e 1 million pixels == 1 million runs
+    This happens in parrallel, and needs to be run once for every pixel because pixels are "blind" to one another.
+*/
 
-in vec3 ourColor; // from .vert
-in vec2 TexCoord; // from .vert
-uniform sampler2D ourTexture;
-uniform sampler1D texture;
+#version 330 core
+
+in vec4 gl_FragCoord; // take in vertex position
+out vec4 frag_color; // send out the fragment colour
  
-out vec4 frag_color;
-out float gl_FragDepth;
- 
-// for zoom and pan
+// ZOOM & PAN
 uniform float centerX;
 uniform float centerY;
 uniform float zoom;
 
-
-// colour variation from other site
+// COLOUR
+out float gl_FragDepth;
 uniform vec4 color_ranges;
-
-// for funky colour setting
-uniform vec4 startColour;
-uniform vec4 endColour;
 
 #define MAX_ITERATIONS 500
  
 int generate_mandlebrot()
 {
+    // set up real and imaginary positions for 
     vec2 c, d;
     c.x = ((gl_FragCoord.x / 1500.0 - 0.5) * zoom + centerX ) * 5.0; // c.real number
     c.y = ((gl_FragCoord.y / 850.0 - 0.6) * zoom + centerY ) * 5.0; // c.imaginary number
  
-    int iterations = 0;
     d = c; // assign d vec 2 for original values
+    //d.x = 0.0;
+    //d.y = 0.0;
+    int iterations = 0;
  
     while (iterations < MAX_ITERATIONS)
     {
@@ -51,55 +52,54 @@ int generate_mandlebrot()
 }
 
 
-vec4 generate_color()
+vec4 generate_colour()
 {
     int iter = generate_mandlebrot();
-    
-    //return texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);
-    //return texture1D(texture, (i == iter ? 0.0 : float(i)) / 100.0);
-
-    //if (iter == MAX_ITERATIONS)
-    //{
-    //    gl_FragDepth = 0.0f;
-    //    return vec4(0.8f, 0.0f, 0.5f, 1.0f); // inside colour
-    //}
-    //
-    //float c = sqrt(float(i) / float(MAX_ITERATIONS)) / 2;
-    //float x = (cos(startColour.x) / c / sin(endColour.x)) / tan(c) / sin(12.0);
-    //float y = (sin(startColour.y) / c / tan(endColour.y)) / sin(c) / cos(22.0);
-    //float z = (tan(startColour.z) / c / cos(endColour.z)) / cos(c) / tan(32.0);
-    ////gl_FragDepth = iter / 2;
-    //
-    //return vec4(cos(x), sin(y), sin(z) , 1.0);
-    
     if (iter == MAX_ITERATIONS)
     {
         gl_FragDepth = 0.0f;
-        return vec4(0.8f, 0.1f, 0.1f, 0.5f); // inside colour
+        return vec4(0.1f, 0.1f, 0.1f, 0.5f); // inside colour
     }
-    
-    
+
     float iterations = float(iter) / MAX_ITERATIONS;    
     gl_FragDepth = iterations;
-    return vec4(0.2f, iterations, 0.3f, 1.0f); // OLD background colour
+    //return vec4(0.2f, iterations, 0.3f, 1.0f); // edge of Mandlebrot set colour GIVE US 3 COLOURS
 
+    // COLOUR USING THE COLOR_RANGES, UPDATED AND SET IN MAIN WHILE LOOP WITH glReadPixels() & assigning to "ranges"
+    //                    R  ,  G  ,  B  ,  Opacity
+    // YPAG setting
+    //vec4 color0 = vec4(0.7f, 0.8f, 0.0f, 1.0f); // Background-Colour: Yellow-ish
+    //vec4 color2 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Outer-Colour     : purple-ish 
+    //vec4 color1 = vec4(0.0f, 0.8f, 0.7f, 1.0f); // Inner-Colour     : Aqua-ish
+    //vec4 color3 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Edge-Colour      : Green-ish
     
-    //                  R  ,  G  ,  B  ,  Opacity
-    vec4 color0 = vec4(0.0f, 0.6f, 0.0f, 1.0f); // Green
-    vec4 color1 = vec4(0.5f, 0.0f, 0.0f, 1.0f); // Red
-    vec4 color2 = vec4(0.0f, 0.8f, 0.7f, 1.0f); // Blue
-    vec4 color3 = vec4(0.2f, 0.0f, 0.2f, 1.0f); // White
+    // RGY setting
+    vec4 color0 = vec4(0.1f, 1.0f, 0.1f, 1.0f); // Background-Colour: Green 
+    vec4 color1 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Outer-Colour     : Yellow
+    vec4 color2 = vec4(1.0f, 0.1f, 0.1f, 1.0f); // Inner-Colour     : Red
+    vec4 color3 = vec4(1.0f, 0.0f, 0.2f, 1.0f); // Edge-Colour      : Cyan
+
+    // CMYK setting
+    //vec4 color0 = vec4(0.0f, 1.0f, 1.0f, 1.0f); // Background-Colour: Cyan
+    //vec4 color1 = vec4(1.0f, 0.0f, 1.0f, 1.0f); // Outer-Colour     : Magenta
+    //vec4 color2 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Inner-Colour     : Yellow
+    //vec4 color3 = vec4(0.0f, 0.75f, 0.45f, 1.0f); // Edge-Colour      : Forest Green
     
-    float fraction = 0.5f;
-    if (iterations < color_ranges[0])
+    float fraction = 0.0f;
+    if (iterations < color_ranges[1])
     {
          fraction = (iterations - color_ranges[0]) / (color_ranges[1] - color_ranges[0]);
-         return mix(color0, color1, fraction);
+         return mix(color0, color2, fraction);
     }
-    else if (iterations < color_ranges[1])
+    else if (iterations < color_ranges[2])
     {
         fraction = (iterations - color_ranges[1]) / (color_ranges[2] - color_ranges[1]);
         return mix(color1, color2, fraction);
+    }
+    else if (iterations < color_ranges[3])
+    {
+        fraction = (iterations - color_ranges[2]) / (color_ranges[3] - color_ranges[2]);
+        return mix(color1, color3, fraction);
     }
     else
     {
@@ -110,5 +110,5 @@ vec4 generate_color()
  
 void main()
 {
-    frag_color = generate_color();
+    frag_color = generate_colour();
 }
