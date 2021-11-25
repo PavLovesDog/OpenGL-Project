@@ -3,7 +3,8 @@
     it then performs the operations below on the fragment and outputs it with new coordinates and color data. 
     this happens after the rasterization stage on the OpenGL pipeline.
     for every fragment, or pixel, on the screen, this code will run through the GPU. i.e 1 million pixels == 1 million runs
-    This happens in parrallel, and needs to be run once for every pixel because pixels are "blind" to one another.
+    This happens in parrallel, and needs to be run once for every pixel because pixels are "blind" to one another and will not
+    communicate between themsleves.
 */
 
 #version 330 core
@@ -20,7 +21,7 @@ uniform float zoom;
 out float gl_FragDepth;
 uniform vec4 color_ranges;
 
-#define MAX_ITERATIONS 500
+#define MAX_ITERATIONS 1000 // determine depth of detail
  
 int generate_mandlebrot()
 {
@@ -67,23 +68,12 @@ vec4 generate_colour()
 
     // COLOUR USING THE COLOR_RANGES, UPDATED AND SET IN MAIN WHILE LOOP WITH glReadPixels() & assigning to "ranges"
     //                    R  ,  G  ,  B  ,  Opacity
-    // YPAG setting
-    //vec4 color0 = vec4(0.7f, 0.8f, 0.0f, 1.0f); // Background-Colour: Yellow-ish
-    //vec4 color2 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Outer-Colour     : purple-ish 
-    //vec4 color1 = vec4(0.0f, 0.8f, 0.7f, 1.0f); // Inner-Colour     : Aqua-ish
-    //vec4 color3 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Edge-Colour      : Green-ish
-    
-    // RGY setting
-    vec4 color0 = vec4(0.1f, 1.0f, 0.1f, 1.0f); // Background-Colour: Green 
-    vec4 color1 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Outer-Colour     : Yellow
-    vec4 color2 = vec4(1.0f, 0.1f, 0.1f, 1.0f); // Inner-Colour     : Red
-    vec4 color3 = vec4(1.0f, 0.0f, 0.2f, 1.0f); // Edge-Colour      : Cyan
-
-    // CMYK setting
-    //vec4 color0 = vec4(0.0f, 1.0f, 1.0f, 1.0f); // Background-Colour: Cyan
-    //vec4 color1 = vec4(1.0f, 0.0f, 1.0f, 1.0f); // Outer-Colour     : Magenta
-    //vec4 color2 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Inner-Colour     : Yellow
-    //vec4 color3 = vec4(0.0f, 0.75f, 0.45f, 1.0f); // Edge-Colour      : Forest Green
+    // CMYK - colour setting
+    vec4 color0 = vec4(0.0f, 1.0f, 1.0f, 1.0f); // Background-Colour: Cyan
+    vec4 color1 = vec4(1.0f, 0.0f, 1.0f, 1.0f); // Outer-Colour     : Magenta
+    vec4 color2 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Inner-Colour     : Yellow
+    vec4 color3 = vec4(1.0f, 0.0f, 1.0f, 1.0f); // Edge-Colour      : Magenta
+    vec4 color4 = vec4(0.0f, 1.0f, 1.0f, 1.0f); // inner edge-colour: Cyan
     
     float fraction = 0.0f;
     if (iterations < color_ranges[1])
@@ -99,7 +89,7 @@ vec4 generate_colour()
     else if (iterations < color_ranges[3])
     {
         fraction = (iterations - color_ranges[2]) / (color_ranges[3] - color_ranges[2]);
-        return mix(color1, color3, fraction);
+        return mix(color4, color3, fraction);
     }
     else
     {

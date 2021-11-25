@@ -101,6 +101,7 @@ void unbind_link_shaders(VAO VAO1, VBO VBO1, EBO EBO1)
 }
 
 // Handles the panning, zooming & quit functions
+// code sourced: see README.txt
 void handle_input(GLFWwindow* window)
 {
 	// if user hits 'Esc', close the window
@@ -152,7 +153,9 @@ void handle_input(GLFWwindow* window)
 	}
 }
 
-// This function sorts
+// Function to sort the read pixel data and find the first
+// non zero numbers to determine colour for each fragment.
+// code sourced: see README.txt
 glm::vec4 find_ranges(std::vector<float> &data)
 {
 	std::sort(data.begin(), data.end()); // arrange elements in ascending order
@@ -176,7 +179,7 @@ int main()
 	initialise();
 
 	// Create window (width, height, title, fullscreened, unknown);
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Mandlebrot Viewer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Charlies Mandlebrot Viewer", NULL, NULL);
 	setup_GLwindow(window);
 
 	// call to shader cpp, creates shader object using default.vert & default.frag
@@ -192,8 +195,8 @@ int main()
 
 	glEnable(GL_DEPTH_TEST); // enable for our color_ranges to determine depth of fragments, to determine colour
 
-	std::vector<float> pixel_data(screenWidth * screenHeight, 0.0f);
-	glm::vec4 ranges = glm::vec4(0.0f, 0.5f, 0.66667f, 1.0f); // declare and assign 
+	std::vector<float> pixel_data(screenWidth * screenHeight, 0.0f); // vector to store current pixel data in
+	glm::vec4 ranges = glm::vec4(0.0f, 0.5f, 0.66667f, 1.0f); // initial vec for colour ranges
 	
 	// begin loop to run while window is open
 	while (!glfwWindowShouldClose(window))
@@ -208,13 +211,10 @@ int main()
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "zoom"), zoom);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerX"), centerX);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerY"), centerY);
-		//shaderProgram.set_vec4("color_ranges", ranges); // set vec4 values for colour ranges
-		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), ranges.x, ranges.y, ranges.z, ranges.w);//*/
+		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), ranges.x, ranges.y, ranges.z, ranges.w);
 
 		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
-		//glDrawArrays(GL_TRIANGLES, 0, 6); // cuts screen in half???
-
 
 		// read the colour ranges of pixels on screen, save to pixel data
 		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data()); 

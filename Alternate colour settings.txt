@@ -1,0 +1,22 @@
+Replace these settings within the generate_colour() function within "default.frag" for fun funky colour variations!    
+
+    // YPAG - colour setting
+    //vec4 color0 = vec4(0.7f, 0.8f, 0.0f, 1.0f); // Background-Colour: Yellow-ish
+    //vec4 color2 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Outer-Colour     : purple-ish 
+    //vec4 color1 = vec4(0.0f, 0.8f, 0.7f, 1.0f); // Inner-Colour     : Aqua-ish
+    //vec4 color3 = vec4(0.5f, 0.0f, 0.5f, 1.0f); // Edge-Colour      : purple-ish 
+    //vec4 color4 = vec4(0.7f, 0.8f, 0.0f, 1.0f); // inner edge-colour: Yellow-ish
+    
+    // RGY - colour setting
+    //vec4 color0 = vec4(0.1f, 1.0f, 0.1f, 1.0f); // Background-Colour: Green 
+    //vec4 color1 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Outer-Colour     : Yellow
+    //vec4 color2 = vec4(1.0f, 0.1f, 0.1f, 1.0f); // Inner-Colour     : Red
+    //vec4 color3 = vec4(1.0f, 1.0f, 0.0f, 1.0f); // Edge-Colour      : Yellow
+    //vec4 color4 = vec4(0.1f, 1.0f, 0.1f, 1.0f); // inner edge-colour: Green
+
+    // RGB - colour setting
+    //vec4 color0 = vec4(1.0f, 0.0f, 0.0f, 1.0f); // Background-Colour: Red
+    //vec4 color1 = vec4(0.0f, 1.0f, 0.0f, 1.0f); // Outer-Colour     : Green
+    //vec4 color2 = vec4(0.0f, 0.0f, 1.0f, 1.0f); // Inner-Colour     : Blue
+    //vec4 color3 = vec4(0.0f, 1.0f, 0.0f, 1.0f); // Edge-Colour      : Green
+    //vec4 color4 = vec4(1.0f, 0.0f, 0.0f, 1.0f); // inner edge-colour: Red

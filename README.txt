@@ -1,6 +1,6 @@
 TO DO:
 	#1 write up comments on the frag & vertex shader stating how each vertex has this code run on it through the GPU
-	   therefore, running concurrently on all the GPUs cores
+	   therefore, running concurrently on all the GPUs cores ======== NEEDS ELABORATION
 
 	#2 try and implement it to run only within main (i.e on the CPU)
 		- time & graph/plot differences
@@ -25,25 +25,55 @@ Submission
 With my project I used an online tutorial to help set up my own OpenGl project to help me better understand the workings 
 of openGL and how the shaders (vertex and Fragment) operate within the context of openGL!
 
+Note*** -EBO, VBO, VAO & shaderClass Header and CPP files for OpenGL setup were demonstrated on the
+	 OpenGL Course - Create 3D and 2D Graphics With C++ referenced below, I merely coded along to 
+	 the video to construct them.
+
+	-the default.vert & default.frag shaders were setup with the same video, then manipulated by me 
+	 with the other resources referenced below to get my desired output.
+
+Using the program:
+-Arrow keys to pan
+'+' & '-' keys on the NumPad to zoom in & out, respectively.
+
 
 =============
    Report
 =============
 ______
 GPGPU
-- what is it?
+- What is it?
+General Purpose Graphics Processing Unit(GPU), is a processing unit which performs calculations with great parallelism, due
+to its many cores, which would otherwise run through the CPU.
+Namely, the GPU is dedicated to graphics rendering.
+
 - why do we use it?
+Unlike the CPU, the GPU was designed to calculate vast sums of calculations in parallel, so for displaying graphics to a screen
+the GPU can handle the necessary tasks quickly and efficiently, without taxing the CPU or other resources 
+(such as battery-life for mobile devices).
+
 - why do we need it?
+Thousands to millions of calculations are performed every second over the many cores of the GPU, this enables the display 
+on your device to be constantly updated and provide a clean, smooth viewing experience. without a GPU, modern day graphics
+would greatly hinder the CPU & we'd probably all be outside looking at nature instead 
 
 ____________________________________
 CPU vs. GPU - WHat's the difference?
+CPUs and GPUs are designed for specific purposes.
+The CPU architecture is designed to handle a wide range of tasks sequentially. that is, it has a few heavyweight cores and large
+memory size for task-parallelism with high clock speeds. This gives the illusion of parallelism, but is essentially only running
+one task at a time.
+The GPU architecture is throughput-optimized for high-end parallel computing, be it for graphical computing, machine-learning or
+scientific computation. it is comprised of thousands of lightweight cores for high memory throughput and data parallelism. 
+The GPU is optimized for dimensional matrix arithmetic and floating point calculations.
 
 
 _______________
 GPU Pros & Cons
-- arithmetic complexity
-- high parallelism
-- GPU memory - limitation?
+- arithmetic complexity: designed for small set calculations such as linear algebra
+- high parallelism: designed to rapidly manipulate huge chunks of data all at once.
+- GPU memory limits: memory access has high latency
+- 
 
 _____________________________
 Graphics Pipeline - explained

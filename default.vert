@@ -1,6 +1,6 @@
 /*
     Like the fragment shader, the vertex shader is also run once per pixel through the GPU simulataneously,
-
+    this will set the position of each vertex to be worked on.
 */
 
 #version 330 core

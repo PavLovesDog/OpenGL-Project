@@ -31,4 +31,4 @@ private:
 };
 
 
-#endif // !SHADER_CLASS_H
+#endif
