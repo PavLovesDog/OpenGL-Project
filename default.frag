@@ -3,7 +3,7 @@
     it then performs the operations below on the fragment and outputs it with new coordinates and color data. 
     this happens after the rasterization stage on the OpenGL pipeline.
     for every fragment, or pixel, on the screen, this code will run through the GPU. i.e 1 million pixels == 1 million runs
-    This happens in parrallel, and needs to be run once for every pixel because pixels are "blind" to one another and will not
+    This happens in parrallel, and needs to be run once for every pixel, because pixels are "blind" to one another and will not
     communicate between themsleves.
 */
 
@@ -25,14 +25,15 @@ uniform vec4 color_ranges;
  
 int generate_mandlebrot()
 {
-    // set up real and imaginary positions for 
+    // set up real and imaginary positions
     vec2 c, d;
     c.x = ((gl_FragCoord.x / 1500.0 - 0.5) * zoom + centerX ) * 5.0; // c.real number
     c.y = ((gl_FragCoord.y / 850.0 - 0.6) * zoom + centerY ) * 5.0; // c.imaginary number
  
-    d = c; // assign d vec 2 for original values
-    //d.x = 0.0;
-    //d.y = 0.0;
+    //d = c; // assign d vec 2 for original values
+    // let d = 0 for first complex iteration
+    d.x = 0.0;
+    d.y = 0.0;
     int iterations = 0;
  
     while (iterations < MAX_ITERATIONS)

@@ -14,6 +14,8 @@ Submission
 	- why do we need compute shader?
 	- why do we need openGL?
 	- how GPU programming works vs CPU programming
+	
+	-Geberal processing ON a GPU, things coded to be optimized on the GPU, which would otherwise run on the CPU
 
 	- explain what my program is
 	- what will be seeing/ what expect to see
@@ -22,8 +24,9 @@ Submission
 =================================
  Explanation & using the program
 =================================
-With my project I used an online tutorial to help set up my own OpenGl project to help me better understand the workings 
-of openGL and how the shaders (vertex and Fragment) operate within the context of openGL!
+Because I started early on my assessment, for my project I used an online tutorial to help set up my own OpenGl 
+project to help me better understand the workings of openGL and how the shaders (vertex and Fragment) 
+operate within the context of openGL!
 
 Note*** -EBO, VBO, VAO & shaderClass Header and CPP files for OpenGL setup were demonstrated on the
 	 OpenGL Course - Create 3D and 2D Graphics With C++ referenced below, I merely coded along to 
@@ -43,19 +46,30 @@ Using the program:
 ______
 GPGPU
 - What is it?
-General Purpose Graphics Processing Unit(GPU), is a processing unit which performs calculations with great parallelism, due
-to its many cores, which would otherwise run through the CPU.
-Namely, the GPU is dedicated to graphics rendering.
+General Purpose Graphics Processing Unit(GPU), is a processing unit which performs general calculations with great parallelism, 
+due to its many cores, which would otherwise run through the CPU.
+Usually, the Graphics Processing Unit(GPU) is dedicated to graphics rendering.
+However, the term GPGPU came about when code began to be optimized to run through the GPU rather than CPU. As the technology
+and need for software parallelism grew, the CPU quickly became unable to keep up due to its sequential nature, where the GPU
+could handle massive amounts of data as long as the code was written for its architecture.
+*prevelently this is within the areas of machine learning (A.I), crypto-mining, graphics-processing (the GPUs original function),
+scientific computations & other physics calculations.
+  
 
 - why do we use it?
 Unlike the CPU, the GPU was designed to calculate vast sums of calculations in parallel, so for displaying graphics to a screen
-the GPU can handle the necessary tasks quickly and efficiently, without taxing the CPU or other resources 
-(such as battery-life for mobile devices).
+the GPU can handle the necessary tasks quickly and efficiently, without taxing all resources, where the CPU would be left behind
+trying to solve all graphics equations sequentially. 
+We use this technology to handle massive amounts of data which require specific tasks, or low-level calculations performed on
+every set of data (such as linear algebra, floating-point clculations etc.), that need to be solved simultaneuosly for correct
+& smootg data output of the program running the code.
 
 - why do we need it?
 Thousands to millions of calculations are performed every second over the many cores of the GPU, this enables the display 
 on your device to be constantly updated and provide a clean, smooth viewing experience. without a GPU, modern day graphics
-would greatly hinder the CPU & we'd probably all be outside looking at nature instead 
+would greatly hinder the CPU & we'd probably all be outside looking at nature instead.
+We need General Purpose Graphics Processing Unit programming for the ever growing demand for better graphics and the exploration into
+better, 'smarter' technology for the uses stated above (look for the *) 
 
 ____________________________________
 CPU vs. GPU - WHat's the difference?
@@ -77,7 +91,7 @@ GPU Pros & Cons
 
 _____________________________
 Graphics Pipeline - explained
-- all stages
+- 
 - programmable stages
 
 ______________
@@ -117,7 +131,7 @@ ________________________________
 https://learnopengl.com/Getting-started/Textures
 
 ___________________________________________________________________________________________________________________________
-*** FRAGMENT SHADER code sourced from assessment steps "algorithm for the Mandlebrot set" & multiple online demonstrations:
+*** FRAGMENT SHADER code sourced from assessment brief steps "algorithm for the Mandlebrot set" & multiple online demonstrations:
 
 https://physicspython.wordpress.com/2020/02/16/visualizing-the-mandelbrot-set-using-opengl-part-1/
 &&
