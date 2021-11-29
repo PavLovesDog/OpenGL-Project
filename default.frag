@@ -30,7 +30,6 @@ int generate_mandlebrot()
     c.x = ((gl_FragCoord.x / 1500.0 - 0.5) * zoom + centerX ) * 5.0; // c.real number
     c.y = ((gl_FragCoord.y / 850.0 - 0.6) * zoom + centerY ) * 5.0; // c.imaginary number
  
-    //d = c; // assign d vec 2 for original values
     // let d = 0 for first complex iteration
     d.x = 0.0;
     d.y = 0.0;
@@ -38,7 +37,7 @@ int generate_mandlebrot()
  
     while (iterations < MAX_ITERATIONS)
     {
-        
+        // mandlebrot equation: z(n) = z(n-1)^2 + c
         float a = (d.x * d.x - d.y * d.y) + c.x;
         float b = (d.y * d.x + d.x * d.y) + c.y;
          
@@ -57,15 +56,17 @@ int generate_mandlebrot()
 vec4 generate_colour()
 {
     int iter = generate_mandlebrot();
+
+    // if points convergent, paint black
     if (iter == MAX_ITERATIONS)
     {
         gl_FragDepth = 0.0f;
         return vec4(0.1f, 0.1f, 0.1f, 0.5f); // inside colour
     }
+    // else points divergent...
 
-    float iterations = float(iter) / MAX_ITERATIONS;    
-    gl_FragDepth = iterations;
-    //return vec4(0.2f, iterations, 0.3f, 1.0f); // edge of Mandlebrot set colour GIVE US 3 COLOURS
+    float iterations = float(iter) / MAX_ITERATIONS; // create number between 0 & 1 to mix colours
+    gl_FragDepth = iterations; // set the depth of fragment
 
     // COLOUR USING THE COLOR_RANGES, UPDATED AND SET IN MAIN WHILE LOOP WITH glReadPixels() & assigning to "ranges"
     //                    R  ,  G  ,  B  ,  Opacity
@@ -77,10 +78,12 @@ vec4 generate_colour()
     vec4 color4 = vec4(0.0f, 1.0f, 1.0f, 1.0f); // inner edge-colour: Cyan
     
     float fraction = 0.0f;
+
+    // if iterations float is less than value stored in color_ranges data position x, y, z or w
     if (iterations < color_ranges[1])
     {
-         fraction = (iterations - color_ranges[0]) / (color_ranges[1] - color_ranges[0]);
-         return mix(color0, color2, fraction);
+         fraction = (iterations - color_ranges[0]) / (color_ranges[1] - color_ranges[0]); // determine weight of mix of colours
+         return mix(color0, color2, fraction); // mix colours!
     }
     else if (iterations < color_ranges[2])
     {

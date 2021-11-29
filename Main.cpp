@@ -195,9 +195,10 @@ int main()
 
 	glEnable(GL_DEPTH_TEST); // enable for our color_ranges to determine depth of fragments, to determine colour
 
+
 	std::vector<float> pixel_data(screenWidth * screenHeight, 0.0f); // vector to store current pixel data in
-	glm::vec4 ranges = glm::vec4(0.0f, 0.5f, 0.66667f, 1.0f); // initial vec for colour ranges
-	
+	glm::vec4 color_ranges = glm::vec4(0.0f, 0.5f, 0.66667f, 1.0f); // initial vec for colour ranges
+
 	// begin loop to run while window is open
 	while (!glfwWindowShouldClose(window))
 	{
@@ -211,14 +212,17 @@ int main()
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "zoom"), zoom);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerX"), centerX);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerY"), centerY);
-		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), ranges.x, ranges.y, ranges.z, ranges.w);
+		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), color_ranges.x, 
+																			color_ranges.y, 
+																			color_ranges.z, 
+																			color_ranges.w);
 
 		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
 
 		// read the colour ranges of pixels on screen, save to pixel data
 		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data()); 
-		ranges = find_ranges(pixel_data); // set new colour in ranges to pass into 'color_ranges' next pass
+		color_ranges = find_ranges(pixel_data); // set new colour to pass into 'color_ranges' next pass
 
 		glfwSwapBuffers(window); // swap buffer so image gets updated each frame
 		
