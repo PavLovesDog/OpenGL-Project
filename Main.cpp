@@ -40,9 +40,9 @@ float screenWidth{ 1280 },
 float centerX{ 0.0f };
 float centerY{ 0.0f };
 float zoom{ 1.0f };
-float zoomOutSpeed{ 1.25f }; // lower number for slower zoom out
-float zoomInSpeed{ 0.85f }; // high number for slower zoom in (1 being the highest)
-float speed{ 0.025f };
+float zoomOutSpeed{ 1.05f }; // lower number for slower zoom out
+float zoomInSpeed{ 0.95f }; // high number for slower zoom in (1 being the highest)
+float speed{ 0.0025f };
 
 
 // Initialise the GLFW, determine which profile to use
@@ -183,7 +183,7 @@ int main()
 
 	// call to shader cpp, creates shader object using default.vert & default.frag
 	Shader shaderProgram("default.vert", "default.frag");
-	
+
 	// create Vertex Array Object and bind it
 	VAO VAO1;
 	VAO1.Bind();
@@ -211,21 +211,21 @@ int main()
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "zoom"), zoom);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerX"), centerX);
 		glUniform1f(glGetUniformLocation(shaderProgram.ID, "centerY"), centerY);
-		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), color_ranges.x, 
-																			color_ranges.y, 
-																			color_ranges.z, 
-																			color_ranges.w);
+		glUniform4f(glGetUniformLocation(shaderProgram.ID, "color_ranges"), color_ranges.x,
+			color_ranges.y,
+			color_ranges.z,
+			color_ranges.w);
 
 		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
 
 		// read the colour ranges of pixels on screen, save to pixel data
-		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data()); 
+		glReadPixels(0, 0, screenWidth, screenHeight, GL_DEPTH_COMPONENT, GL_FLOAT, pixel_data.data());
 		color_ranges = find_ranges(pixel_data); // set new colour to pass into 'color_ranges' next pass
 
 		glfwSwapBuffers(window); // swap buffer so image gets updated each frame
-		
+
 		// process all glfw window & input events
 		glfwPollEvents();
 		handle_input(window);
