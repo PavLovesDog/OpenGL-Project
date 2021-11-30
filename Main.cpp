@@ -13,8 +13,6 @@
 #include"VBO.h"
 #include"EBO.h"
 
-// !!! Think of shaders as functions to fun on the GPU !!!
-
 // Vertices Coordinates, coordinates for geometry shape
 GLfloat vertices[] = 
 {
@@ -42,7 +40,9 @@ float screenWidth{ 1280 },
 float centerX{ 0.0f };
 float centerY{ 0.0f };
 float zoom{ 1.0f };
-float speed{ 0.0025f };
+float zoomOutSpeed{ 1.25f }; // lower number for slower zoom out
+float zoomInSpeed{ 0.85f }; // high number for slower zoom in (1 being the highest)
+float speed{ 0.025f };
 
 
 // Initialise the GLFW, determine which profile to use
@@ -79,7 +79,6 @@ void setup_GLwindow(GLFWwindow* window)
 	// use glad to load configurations of OpenGL
 	gladLoadGL();
 
-	//glViewport(0, 0, screenWidth, screenHeight); // coordinates of display within window, specifying the viewport
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// set colour of window background
@@ -141,15 +140,15 @@ void handle_input(GLFWwindow* window)
 	// user presses 'minus' key on numpad, zoom out
 	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS)
 	{
-		zoom = zoom * 1.04f;
+		zoom = zoom * zoomOutSpeed;
 		if (zoom > 1.0f) zoom = 1.0f;
 	}
 
 	// user presses 'plus' key on numpad, zoom in
 	if (glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS)
 	{
-		zoom = zoom * 0.98f;
-		if (zoom < 0.00005f) zoom = 0.00005f;
+		zoom = zoom * zoomInSpeed;
+		if (zoom < 0.0005f) zoom = 0.0005f;
 	}
 }
 
@@ -218,6 +217,7 @@ int main()
 																			color_ranges.w);
 
 		VAO1.Bind(); // binds VAO for OpenGl to know how to use it
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // draw shapes with triangle primitives, 6 is vertex amount
 
 		// read the colour ranges of pixels on screen, save to pixel data
