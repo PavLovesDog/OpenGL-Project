@@ -10,6 +10,10 @@ Although Compute Shaders were discussed heavily in classes, I've elected to forg
 as my base was working without a Compute Shader and added levels of complication I couldn't work around to get my Mandlebrot set functioning
 again.
 
+ALSO you'll probably need to re-set the 'libraries' and 'includes' directories in the Properties menu (found in the Debug dropdown menu)
+     under Configuration Properties -> VC++ Directories -> General -> Include Directories & Library Directories 
+	change these to the 'lib' and 'include' folders in your projects extracted location.
+
 
 Note*** -EBO, VBO, VAO & shaderClass Header and CPP files for OpenGL setup were demonstrated on the
 	 OpenGL Course - Create 3D and 2D Graphics With C++ referenced below, I merely coded along to 
